@@ -1,0 +1,211 @@
+//Default Values For a Sensor
+int sensorValue = 0;
+
+//Temperature Value ints
+int tempVal = A2; 
+
+//Earthquake ints
+int quakePin = 4; 
+int quakeState = 0;
+
+//Gas the sensor
+int MQ2pin = A3;
+const int gas = 0;
+
+//Buzzer
+int piezoPin = 8;
+
+// include the library code:
+#include <LiquidCrystal.h>
+
+// initialize the library with the numbers of the interface pins
+LiquidCrystal lcd(12, 11, 5, 7, 3, 10);
+
+//Button Values
+int count = 0;          
+
+
+void setup()
+{
+    Serial.begin(9600);
+  pinMode(A0, INPUT);
+
+}
+
+void loop()
+{
+  //For Earthquake sensor
+  quakeState = digitalRead(quakePin);
+    
+  //Recognise the Button
+  pinMode(2, INPUT);
+
+  //Default setting
+ autoswitcher(); 
+
+  
+}
+
+void brightness()
+{ 
+ int value = analogRead(A0);
+  Serial.println(value);
+  if (value <= 164) {
+    Serial.println("It's Dark");
+     lcd.print("It's Dark");
+   }
+  if ((value > 165) && (value <= 327)) {
+    Serial.println("Comfortable light ");
+     lcd.print("Comfortable light");
+   }
+  if ((value > 328) && (value <= 511)) {
+    Serial.println("Noon Brightness");
+        lcd.print("Noon Brightness");
+  }
+  if ((value > 512) && (value <= 696)) {
+    Serial.println("A bit too bright");
+        lcd.print("A bit too bright");
+  }
+  if ((value > 697) && (value <= 899)) {
+    Serial.println("Way too bright");
+        lcd.print("Way too bright");
+  }
+  if (value > 900) {
+    Serial.println("My eyes are burning");
+        lcd.print("My eyes are burning");
+   }
+  delay(100); 
+}
+
+
+void rain()
+{
+  int value = analogRead(A1);
+  Serial.println(value);
+  if (value <= 164) {
+    Serial.println("Dry Weather");
+    lcd.print("Dry Weather");
+   }
+  if ((value > 165) && (value <= 327)) {
+    Serial.println("Dew or Heavy Mist ");
+    lcd.print("Dew or Heavy Mist");
+   }
+  if ((value > 328) && (value <= 511)) {
+    Serial.println("Light Rain");
+    lcd.print("Light Rain");
+  }
+  if ((value > 512) && (value <= 696)) {
+    Serial.println("Moderate Rain");
+    lcd.print("Moderate Rain");
+  }
+  if ((value > 697) && (value <= 854)) {
+    Serial.println("Heavy Rain");
+    lcd.print("Heavy Rain");
+  }
+  if (value > 855) {
+    Serial.println("Very Heavy Rain");
+    lcd.print("Very Heavy Rain");
+   }
+}
+
+
+void temp()
+{
+  int temp = analogRead(tempVal);    //Read the analog pin
+  temp = temp * 0.48828125;   // convert output (mv) to readable celcius
+  Serial.print("Temperature: ");
+  	lcd.print("Temperature: ");
+  Serial.print(temp);
+      lcd.print(temp);
+  Serial.println("C");  //print the temperature status
+      lcd.println("C");
+  delay(1000);  
+}
+	
+
+void quake()
+{
+  // read the state of the tilt sensor value:
+  quakeState = digitalRead(quakePin);
+
+  if (quakeState == LOW) {
+    Serial.println("Earthquake!!");
+    lcd.print("Earthquake!!");
+  } else {
+    Serial.println("Not earthquake");
+    lcd.print("Not Earthquake");
+  } 
+}
+
+
+void gaz()
+{
+   float sensorValue;
+sensorValue = analogRead(MQ2pin); // read analog input pin 0
+
+  if(sensorValue >= 470){
+    
+    Serial.print("SMOKE!! ");
+    lcd.print("SMOKE!! "); 
+    Serial.print(sensorValue);
+    lcd.print(sensorValue);
+     }
+  
+  else{
+    Serial.println("Gas Value:");
+    lcd.println("Gas Value:");
+    Serial.println(sensorValue);
+    lcd.println(sensorValue);
+  } 
+}
+
+
+void autoswitcher(){
+  
+      lcd.print("Values of ");
+  	  lcd.print("sensors");
+  delay(3000); 
+   lcd.clear();
+ 
+    count++;// add 1 to the count
+  
+    if (count >= 2) {
+      brightness();
+      delay(3000);
+         lcd.clear();
+      count++;
+    } 
+    
+    if (count >= 3) {
+      rain();
+      delay(3000);
+         lcd.clear();
+      count++;
+    } 
+    
+    if (count >= 4) {
+      temp();
+      delay(3000);
+         lcd.clear();
+      count++;
+    } 
+    
+      if (count >= 5) {
+      gaz();
+        delay(3000);
+        lcd.clear();
+      count++;
+    } 
+    
+    if (count >= 6) {
+      quake();
+      delay(3000);
+        lcd.clear();
+        count++;
+      
+      if (count >= 7) {
+        lcd.clear();
+        count = 2; 
+    } 
+  }
+}
